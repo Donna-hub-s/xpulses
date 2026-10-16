@@ -1,18 +1,15 @@
 from __future__ import annotations
 
 import html
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from xcore.kernel.api.rbac import get_current_user, require_permission
-from xcore.sdk import AuthPayload, error, get_logger, ok
+from xcore.sdk import AuthPayload, get_logger, ok
 
 from ..utils import authorize_channels, is_broadcast_channel, parse_channels, require_pubsub
-
-if TYPE_CHECKING:
-    from extensions.pubsub.service import PubSubClient
 
 logger = get_logger("xpulses")
 
