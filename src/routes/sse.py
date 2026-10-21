@@ -132,6 +132,11 @@ def sse_routes(svc: Any, caller: Any = None) -> APIRouter:
                 detail="IPC caller non disponible.",
             )
         tenant_id = _extract_tenant_id(request)
+        if not tenant_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Aucun espace de travail sélectionné.",
+            )
         users = (
             await caller("auth", "xauth.users.list.tenant", {"tenant_id": tenant_id})
         ).get("users", [])
@@ -184,6 +189,11 @@ def sse_routes(svc: Any, caller: Any = None) -> APIRouter:
     ):
         redis = require_pubsub(svc)
         tenant_id = _extract_tenant_id(request)
+        if not tenant_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Aucun espace de travail sélectionné.",
+            )
         channel = f"tenant-{tenant_id}"
 
         response = await redis.publish(channel, {"text": html.escape(body.text)})
