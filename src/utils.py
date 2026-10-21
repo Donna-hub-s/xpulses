@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from fastapi import HTTPException, status
 
 if TYPE_CHECKING:
-    from extensions.pubsub.service import PubSubClient
+    from extensions.extpubsub.service import PubSubClient
 
 _CHANNEL_RE = re.compile(r"^[a-zA-Z0-9_\-\.]{1,64}$")
 

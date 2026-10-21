@@ -11,7 +11,7 @@ from xcore.sdk import get_logger
 if TYPE_CHECKING:
     from xcore.kernel.events import Event
 
-    from extensions.pubsub.service import PubSubClient
+    from extensions.extpubsub.service import PubSubClient
 
 logger = get_logger("xpulse.bridge")
 
