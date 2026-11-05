@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 import html
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from xcore.kernel.api.rbac import get_current_user, require_permission
-from xcore.sdk import AuthPayload, get_logger, ok
+from xcore.sdk import AuthPayload, error, get_logger, ok
 
 from ..utils import authorize_channels, is_broadcast_channel, parse_channels, require_pubsub
+
+if TYPE_CHECKING:
+    from extensions.extpubsub.service import PubSubClient
 
 logger = get_logger("xpulses")
 
@@ -132,11 +135,6 @@ def sse_routes(svc: Any, caller: Any = None) -> APIRouter:
                 detail="IPC caller non disponible.",
             )
         tenant_id = _extract_tenant_id(request)
-        if not tenant_id:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Aucun espace de travail sélectionné.",
-            )
         users = (
             await caller("auth", "xauth.users.list.tenant", {"tenant_id": tenant_id})
         ).get("users", [])
@@ -189,11 +187,6 @@ def sse_routes(svc: Any, caller: Any = None) -> APIRouter:
     ):
         redis = require_pubsub(svc)
         tenant_id = _extract_tenant_id(request)
-        if not tenant_id:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Aucun espace de travail sélectionné.",
-            )
         channel = f"tenant-{tenant_id}"
 
         response = await redis.publish(channel, {"text": html.escape(body.text)})
